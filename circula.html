@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CIRCULA — Limpieza que genera ingresos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAE3D2; --paper2:#DFD6BE; --ink:#1E2A22;
+  --green:#2E6F4E; --green-dark:#1F4E36; --rust:#C1521B; --blue:#2C5C82; --grey:#8B8578;
+  --card:#F4EFE2; --line:rgba(30,42,34,.14);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#191712; --paper2:#141210; --ink:#EDE7D9; --card:#211E17; --line:rgba(237,231,217,.14);
+    --green:#59A87F; --rust:#E17A3E; --blue:#6FA3CE; --grey:#A69F8E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#191712; --paper2:#141210; --ink:#EDE7D9; --card:#211E17; --line:rgba(237,231,217,.14);
+  --green:#59A87F; --rust:#E17A3E; --blue:#6FA3CE; --grey:#A69F8E;
+}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px));}
+*{margin:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.55;overflow-x:hidden;min-height:100%;}
+h1,h2,h3{font-family:'Archivo',sans-serif;font-weight:900;letter-spacing:-.01em;line-height:1.05;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+.page{display:none;padding:56px 0 88px;}
+.page.active{display:block;}
+main.wrap{transition:opacity .22s ease, transform .22s ease;}
+main.wrap.fading{opacity:0;transform:translateY(12px);}
+@media(max-width:640px){.page{padding:32px 0 56px;}}
+
+/* nav */
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--paper) 88%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);}
+nav.wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Archivo',sans-serif;font-weight:900;font-size:1.3rem;cursor:pointer;}
+.brand .mark{width:34px;height:34px;flex:none;}
+.navlinks{display:flex;gap:26px;font-size:.92rem;font-weight:500;}
+.navlinks a{opacity:.75;border-bottom:2px solid transparent;padding-bottom:4px;transition:opacity .2s,border-color .2s;cursor:pointer;}
+.navlinks a:hover{opacity:1;}
+.navlinks a.active{opacity:1;border-color:var(--rust);}
+.navcta{background:var(--green);color:#F4EFE2;padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem;white-space:nowrap;transition:transform .2s;}
+.navcta:hover{transform:translateY(-2px);}
+.burger{display:none;background:none;border:0;color:var(--ink);font-size:1.6rem;cursor:pointer;}
+@media(max-width:820px){.navlinks{display:none;}.burger{display:block;}}
+#mnav{display:none;flex-direction:column;border-top:1px solid var(--line);}
+#mnav.open{display:flex;}
+#mnav a{padding:14px 24px;border-bottom:1px solid var(--line);font-weight:500;cursor:pointer;}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
+@media(max-width:860px){.hero{grid-template-columns:1fr;}}
+.eyebrow{color:var(--green);font-weight:600;font-size:.95rem;margin-bottom:14px;}
+h1{font-size:clamp(2.4rem,5.5vw,4rem);}
+.hero p.lead{font-size:1.12rem;max-width:46ch;margin-top:18px;opacity:.85;}
+.cta-row{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+.btn{display:inline-block;padding:14px 26px;border-radius:999px;font-weight:600;transition:transform .2s,box-shadow .2s;border:none;font-family:inherit;font-size:1rem;cursor:pointer;}
+.btn-primary{background:var(--green);color:#F4EFE2;box-shadow:0 8px 24px -8px color-mix(in srgb, var(--green) 60%, transparent);}
+.btn-primary:hover{transform:translateY(-3px);}
+.btn-ghost{border:1.5px solid var(--line);background:none;color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink);}
+
+.loop{position:relative;width:100%;max-width:330px;aspect-ratio:1;margin:0 auto;}
+.loop svg{width:100%;height:100%;}
+.loop .ring{transform-origin:50% 50%;animation:spin 26s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loop .chip{position:absolute;width:70px;height:70px;border-radius:20px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 10px 30px -14px rgba(0,0,0,.35);animation:float 5s ease-in-out infinite;}
+.loop .chip:nth-child(2){animation-delay:.6s}.loop .chip:nth-child(3){animation-delay:1.2s}.loop .chip:nth-child(4){animation-delay:1.8s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.c1{top:2%;left:50%;transform:translateX(-50%);} .c2{top:50%;right:0%;transform:translateY(-50%);}
+.c3{bottom:2%;left:50%;transform:translateX(-50%);} .c4{top:50%;left:0%;transform:translateY(-50%);}
+
+.kicker{color:var(--rust);font-weight:600;margin-bottom:10px;}
+h2{font-size:clamp(1.7rem,3.6vw,2.4rem);max-width:20ch;}
+.section-head{max-width:640px;margin-bottom:40px;}
+.section-head p{margin-top:14px;opacity:.85;font-size:1.05rem;}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+@media(max-width:820px){.grid3{grid-template-columns:1fr;}}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+@media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.grid4{grid-template-columns:1fr;}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;transition:transform .25s,box-shadow .25s;}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 40px -20px rgba(0,0,0,.35);}
+.card .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;}
+.ic-green{background:color-mix(in srgb, var(--green) 18%, transparent);}
+.ic-rust{background:color-mix(in srgb, var(--rust) 18%, transparent);}
+.ic-blue{background:color-mix(in srgb, var(--blue) 18%, transparent);}
+.ic-grey{background:color-mix(in srgb, var(--grey) 22%, transparent);}
+.card h3{font-size:1.12rem;margin-bottom:8px;}
+.card p{opacity:.82;font-size:.97rem;}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:8px;}
+@media(max-width:820px){.stats{grid-template-columns:1fr;}}
+.stat{border-left:3px solid var(--rust);padding-left:18px;}
+.stat .num{font-family:'Archivo',sans-serif;font-weight:900;font-size:2.5rem;color:var(--green);}
+.stat .label{opacity:.8;font-size:.94rem;margin-top:4px;}
+.somos-text{max-width:70ch;font-size:1.05rem;opacity:.9;margin-bottom:40px;}
+
+.process{position:relative;width:100%;max-width:500px;aspect-ratio:1;margin:48px auto 0;}
+.process svg{position:absolute;inset:0;width:100%;height:100%;}
+.pnode{position:absolute;width:150px;text-align:center;transform:translate(-50%,-50%);}
+@media(max-width:600px){.pnode{width:118px;font-size:.88rem;}}
+.pnode .dot{width:50px;height:50px;border-radius:50%;background:var(--green);color:#F4EFE2;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:900;margin:0 auto 10px;box-shadow:0 10px 24px -10px color-mix(in srgb, var(--green) 70%, transparent);}
+.pnode h4{font-size:1rem;margin-bottom:4px;}
+.pnode p{font-size:.84rem;opacity:.78;}
+.p1{top:2%;left:50%;} .p2{top:50%;left:98%;transform:translate(-100%,-50%);} .p3{top:98%;left:50%;transform:translate(-50%,-100%);} .p4{top:50%;left:2%;transform:translate(0,-50%);}
+@media(max-width:600px){.p2{left:96%;}.p4{left:4%;}}
+
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+@media(max-width:820px){.split{grid-template-columns:1fr;}}
+.objetivo{margin-top:44px;background:var(--green-dark);color:#F4EFE2;border-radius:20px;padding:32px;}
+.objetivo h3{font-family:'Archivo',sans-serif;font-size:1.25rem;margin-bottom:8px;}
+.objetivo p{opacity:.92;}
+
+/* unete + form */
+.join-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:44px;}
+@media(max-width:820px){.join-picker{grid-template-columns:1fr;}}
+.pick{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;text-align:left;font-family:inherit;color:var(--ink);transition:border-color .2s,transform .2s;}
+.pick:hover{transform:translateY(-3px);}
+.pick.sel{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb, var(--green) 20%, transparent);}
+.pick .ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:10px;}
+.pick h3{font-size:1rem;}
+.pick p{font-size:.88rem;opacity:.75;margin-top:4px;}
+
+.formcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:36px;max-width:640px;}
+@media(max-width:640px){.formcard{padding:24px;}}
+.field{margin-bottom:22px;}
+.field label{display:block;font-weight:600;margin-bottom:8px;font-size:.98rem;}
+.field .hint{font-weight:400;opacity:.6;font-size:.85rem;}
+.field input[type=text],.field input[type=email],.field input[type=tel],.field textarea{
+  width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font-family:inherit;font-size:.98rem;
+}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--green);}
+.field textarea{resize:vertical;min-height:90px;}
+.radiorow{display:flex;flex-direction:column;gap:10px;}
+.radiorow label{display:flex;align-items:center;gap:10px;font-weight:500;cursor:pointer;}
+.radiorow input{accent-color:var(--green);width:18px;height:18px;}
+.formnote{opacity:.65;font-size:.85rem;margin-top:6px;}
+#thanks{display:none;background:var(--green-dark);color:#F4EFE2;border-radius:20px;padding:32px;max-width:640px;}
+#thanks h3{font-family:'Archivo',sans-serif;margin-bottom:8px;}
+.altform{margin-top:18px;font-size:.92rem;opacity:.8;}
+.altform a{text-decoration:underline;}
+
+footer{border-top:1px solid var(--line);padding:48px 0 calc(32px + env(safe-area-inset-bottom,0px));}
+.footgrid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+.footlinks{display:flex;gap:20px;flex-wrap:wrap;font-size:.92rem;opacity:.85;}
+.footlinks a{cursor:pointer;}
+.copy{opacity:.6;font-size:.85rem;margin-top:28px;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="brand" data-go="inicio"><svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M12 2 15 8 9 8Z" fill="#2E6F4E"/><path d="M20 15 17 21 14 15Z" fill="#C1521B"/><path d="M4 15 7 21 1 21Z" fill="#2C5C82"/></svg>CIRCULA</div>
+    <div class="navlinks">
+      <a data-go="inicio">Inicio</a>
+      <a data-go="somos">¿Qué somos?</a>
+      <a data-go="funciona">¿Cómo funciona?</a>
+      <a data-go="modelo">Nuestro modelo</a>
+      <a data-go="unete">Únete</a>
+      <a data-go="contacto">Contáctanos</a>
+    </div>
+    <a class="navcta" data-go="unete">Quiero unirme</a>
+    <button class="burger" id="burgerBtn" aria-label="Abrir menú">☰</button>
+  </nav>
+  <div id="mnav" class="wrap">
+    <a data-go="inicio">Inicio</a><a data-go="somos">¿Qué somos?</a><a data-go="funciona">¿Cómo funciona?</a>
+    <a data-go="modelo">Nuestro modelo</a><a data-go="unete">Únete</a><a data-go="contacto">Contáctanos</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="page" id="inicio">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Red de economía circular</div>
+        <h1>Limpieza que genera ingresos.</h1>
+        <p class="lead">CIRCULA conecta hogares, negocios, personas recolectoras y empresas recicladoras para que los materiales aprovechables dejen de perderse en la calle y se conviertan en una fuente real de ingreso.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" data-go="unete">Quiero unirme</button>
+          <button class="btn btn-ghost" data-go="somos">Conoce CIRCULA</button>
+        </div>
+      </div>
+      <div class="loop">
+        <svg viewBox="0 0 300 300" class="ring"><circle cx="150" cy="150" r="128" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 10"/></svg>
+        <div class="chip c1">📦</div><div class="chip c2">🥤</div><div class="chip c3">🥫</div><div class="chip c4">🍾</div>
+      </div>
+    </div>
+
+    <div style="margin-top:80px;">
+      <div class="section-head">
+        <div class="kicker">Qué hacemos</div>
+        <h2>Una cadena con tres actores, un mismo objetivo</h2>
+      </div>
+      <div class="grid3">
+        <div class="card"><div class="ic ic-green">♻️</div><h3>Hogares y negocios</h3><p>Separan sus materiales reciclables y solicitan su recolección.</p></div>
+        <div class="card"><div class="ic ic-rust">👥</div><h3>Personas recolectoras</h3><p>Recolectan, clasifican y entregan materiales a cambio de un pago justo.</p></div>
+        <div class="card"><div class="ic ic-blue">🏭</div><h3>Empresas recicladoras</h3><p>Reciben materiales clasificados y los reincorporan a sus procesos.</p></div>
+      </div>
+    </div>
+
+    <div style="margin-top:80px;">
+      <div class="section-head">
+        <div class="kicker">Materiales</div>
+        <h2>¿Qué materiales recibimos?</h2>
+        <p>Sepáralos limpios y secos: así conservan más valor y facilitan su recolección.</p>
+      </div>
+      <div class="grid4">
+        <div class="card"><div class="ic ic-blue">🥤</div><h3>PET</h3><p>Botellas de refresco y agua. Enjuágalas y aplástalas para ahorrar espacio.</p></div>
+        <div class="card"><div class="ic ic-rust">📦</div><h3>Cartón</h3><p>Cajas y empaques. Dóblalos planos y mantenlos secos.</p></div>
+        <div class="card"><div class="ic ic-grey">🥫</div><h3>Aluminio</h3><p>Latas de bebidas. Enjuágalas para evitar residuos de comida.</p></div>
+        <div class="card"><div class="ic ic-green">🍾</div><h3>Vidrio</h3><p>Frascos y botellas enteras, sin tapas ni etiquetas si es posible.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="somos">
+    <div class="section-head">
+      <div class="kicker">¿Qué somos?</div>
+      <h2>Recuperamos lo que la calle desperdicia</h2>
+    </div>
+    <p class="somos-text">CIRCULA es una red de recolección y comercialización de materiales reciclables. En México se generan diariamente enormes cantidades de residuos que terminan en calles o basureros sin ser aprovechados: muchos pierden su valor económico simplemente por no separarse a tiempo.</p>
+    <div class="stats">
+      <div class="stat"><div class="num" data-count="139902">0</div><div class="label">toneladas de residuos sólidos urbanos generadas al día en México</div></div>
+      <div class="stat"><div class="num" data-count="36" data-suffix="%">0%</div><div class="label">de PET, cartón, aluminio y vidrio que sí pueden reciclarse</div></div>
+      <div class="stat"><div class="num" data-count="72" data-suffix="%">0%</div><div class="label">de esos materiales se pierde por falta de recolección organizada</div></div>
+    </div>
+  </section>
+
+  <section class="page" id="funciona">
+    <div class="section-head">
+      <div class="kicker">¿Cómo funciona?</div>
+      <h2>De un residuo a una oportunidad</h2>
+      <p>Un ciclo de cuatro pasos que se repite: entre más veces gira, más ingresos y menos residuos sin aprovechar.</p>
+    </div>
+    <div class="process">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="3 6"/><circle r="2.4" fill="var(--rust)"><animateMotion dur="8s" repeatCount="indefinite" path="M 50 8 A 42 42 0 1 1 49.9 8"/></circle></svg>
+      <div class="pnode p1"><div class="dot">1</div><h4>Separa</h4><p>Hogares y negocios separan sus materiales.</p></div>
+      <div class="pnode p2"><div class="dot">2</div><h4>Solicita</h4><p>Se solicita la recolección.</p></div>
+      <div class="pnode p3"><div class="dot">3</div><h4>Recupera</h4><p>Se recoge y se clasifica.</p></div>
+      <div class="pnode p4"><div class="dot">4</div><h4>Genera</h4><p>Se comercializa y se generan ingresos.</p></div>
+    </div>
+  </section>
+
+  <section class="page" id="modelo">
+    <div class="section-head">
+      <div class="kicker">Nuestro modelo</div>
+      <h2>¿Cómo genera ingresos CIRCULA?</h2>
+    </div>
+    <div class="split">
+      <div class="card"><div class="ic ic-green">💰</div><h3>Margen de comercialización</h3><p>Diferencia entre el precio de compra a recolectores y el de venta a recicladoras.</p></div>
+      <div class="card"><div class="ic ic-rust">🏢</div><h3>Servicio para negocios</h3><p>Cuotas o suscripciones para comercios y oficinas que usan la recolección.</p></div>
+      <div class="card"><div class="ic ic-blue">🤝</div><h3>Convenios corporativos</h3><p>Acuerdos con empresas que buscan gestionar sus residuos.</p></div>
+    </div>
+    <div class="section-head" style="margin-top:56px;">
+      <div class="kicker">Impacto</div>
+      <h2>Tres formas en que CIRCULA regresa valor</h2>
+    </div>
+    <div class="split">
+      <div class="card"><div class="ic ic-green">🌎</div><h3>Ambiental</h3><p>Reducimos los residuos que terminan sin aprovecharse.</p></div>
+      <div class="card"><div class="ic ic-rust">👥</div><h3>Social</h3><p>Integramos a recolectores con capacitación y acompañamiento.</p></div>
+      <div class="card"><div class="ic ic-blue">💵</div><h3>Económico</h3><p>Convertimos materiales en una fuente real de valor.</p></div>
+    </div>
+    <div class="objetivo"><h3>Nuestro objetivo</h3><p>Construir una red de economía circular que comience a nivel local y crezca hacia otras regiones.</p></div>
+  </section>
+
+  <section class="page" id="unete">
+    <div class="section-head">
+      <div class="kicker">Únete</div>
+      <h2>Todos podemos formar parte de una economía circular</h2>
+      <p>Elige cómo quieres participar y llena el formulario.</p>
+    </div>
+    <div class="grid3">
+      <div class="join-card"><div class="ic ic-rust">👥</div><h3>Soy recolector(a)</h3><p>Quiero formar parte de la red CIRCULA.</p>
+        <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdnJ0quwtzd2rojL5jYKIL7oflri7Pn7YYo_ubWl7ywMuUBwg/viewform" target="_blank" rel="noopener">Llenar formulario</a></div>
+      <div class="join-card"><div class="ic ic-blue">🏭</div><h3>Soy empresa</h3><p>Quiero opciones de colaboración.</p>
+        <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdnJ0quwtzd2rojL5jYKIL7oflri7Pn7YYo_ubWl7ywMuUBwg/viewform" target="_blank" rel="noopener">Llenar formulario</a></div>
+      <div class="join-card"><div class="ic ic-green">🏠</div><h3>Soy hogar o negocio</h3><p>Quiero solicitar recolección.</p>
+        <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdnJ0quwtzd2rojL5jYKIL7oflri7Pn7YYo_ubWl7ywMuUBwg/viewform" target="_blank" rel="noopener">Llenar formulario</a></div>
+    </div>
+  </section>
+
+  <section class="page" id="contacto">
+    <div class="section-head">
+      <div class="kicker">Contáctanos</div>
+      <h2>Hablemos</h2>
+    </div>
+    <div class="card" style="max-width:420px;">
+      <div class="ic ic-green">🌐</div>
+      <h3>circula.mx</h3>
+      <p>Visita nuestro sitio o escríbenos para conocer más sobre la red.</p>
+      <a class="btn btn-ghost" style="margin-top:14px;" href="http://circula.mx" target="_blank" rel="noopener">Visitar circula.mx</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footgrid">
+      <div class="brand" data-go="inicio"><svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M12 2 15 8 9 8Z" fill="#2E6F4E"/><path d="M20 15 17 21 14 15Z" fill="#C1521B"/><path d="M4 15 7 21 1 21Z" fill="#2C5C82"/></svg>CIRCULA</div>
+      <div class="footlinks">
+        <a data-go="unete">Únete</a><a data-go="somos">¿Qué somos?</a><a data-go="contacto">Contacto</a>
+      </div>
+    </div>
+    <p class="copy">© 2026 CIRCULA — Red de economía circular.</p>
+  </div>
+</footer>
+
+<script>
+var pages=['inicio','somos','funciona','modelo','unete','contacto'];
+var mainEl=document.querySelector('main.wrap');
+function applyPage(id){
+  if(pages.indexOf(id)===-1)id='inicio';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('active',p.id===id);});
+  document.querySelectorAll('.navlinks a,#mnav a').forEach(function(a){a.classList.toggle('active',a.getAttribute('data-go')===id);});
+  document.getElementById('mnav').classList.remove('open');
+  if(id==='somos')animateStats();
+}
+function showPage(id,instant){
+  if(instant){applyPage(id);window.scrollTo(0,0);return;}
+  mainEl.classList.add('fading');
+  setTimeout(function(){
+    applyPage(id);
+    window.scrollTo(0,0);
+    requestAnimationFrame(function(){mainEl.classList.remove('fading');});
+  },200);
+}
+document.querySelectorAll('[data-go]').forEach(function(el){
+  el.addEventListener('click',function(){location.hash=el.getAttribute('data-go');});
+});
+window.addEventListener('hashchange',function(){showPage(location.hash.replace('#',''));});
+document.getElementById('burgerBtn').addEventListener('click',function(){document.getElementById('mnav').classList.toggle('open');});
+
+var statsRun=false;
+function animateStats(){
+  if(statsRun)return; statsRun=true;
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var target=parseFloat(el.getAttribute('data-count'));
+    var suffix=el.getAttribute('data-suffix')||'';
+    var dur=1300,start=null;
+    function step(ts){
+      if(!start)start=ts;
+      var p=Math.min((ts-start)/dur,1);
+      el.textContent=Math.floor(p*target).toLocaleString('es-MX')+suffix;
+      if(p<1)requestAnimationFrame(step); else el.textContent=target.toLocaleString('es-MX')+suffix;
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+showPage(location.hash.replace('#','')||'inicio', true);
+</script>
+</body>
+</html>
